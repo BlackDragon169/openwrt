@@ -98,7 +98,7 @@ define Device/avm_fritzbox-7530
 	DEVICE_TITLE := AVM Fritz!Box 7530
 	IMAGES = sysupgrade.bin
 	IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata
-	DEVICE_PACKAGES := fritz-tffs fritz-caldata u-boot-fritz4040
+	DEVICE_PACKAGES := fritz-tffs fritz-caldata u-boot-fritz4040 ipq-wifi-fritz7530
 endef
 TARGET_DEVICES += avm_fritzbox-7530
 
