@@ -53,4 +53,5 @@ endef
 
 #$(eval $(call generate-ipq-wifi-package,<devicename>,<filename>,<displayname>))
 
+$(eval $(call generate-ipq-wifi-package,fritz7530,fritz7530,AVM FRITZ!Box 7530))
 $(foreach PACKAGE,$(ALLWIFIPACKAGES),$(eval $(call BuildPackage,$(PACKAGE))))
