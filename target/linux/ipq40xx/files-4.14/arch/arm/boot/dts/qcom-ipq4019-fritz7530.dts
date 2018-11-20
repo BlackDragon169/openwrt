@@ -288,9 +288,9 @@
 &wifi0 {
 	status = "okay";
 	qcom,ath10k-calibration-variant = "AVM-FRITZBox-7530";
-}
+};
 
 &wifi1 {
 	status = "okay";
 	qcom,ath10k-calibration-variant = "AVM-FRITZBox-7530";
-}
+};
