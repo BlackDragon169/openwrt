@@ -1,0 +1,15 @@
+Index: u-boot-2017-01-29-6946ebba/config.mk
+===================================================================
+--- u-boot-2017-01-29-6946ebba.orig/config.mk
++++ u-boot-2017-01-29-6946ebba/config.mk
+@@ -206,10 +206,8 @@ endif
+ CPPFLAGS += $(if $(MODEL),-D$(shell echo $(MODEL)))
+ 
+ # Enable garbage collection of un-used sections for SPL
+-ifeq ($(CONFIG_SPL_BUILD),y)
+ CPPFLAGS += -ffunction-sections -fdata-sections
+ LDFLAGS_FINAL += --gc-sections
+-endif
+ 
+ ifneq ($(CONFIG_SYS_TEXT_BASE),)
+ CPPFLAGS += -DCONFIG_SYS_TEXT_BASE=$(CONFIG_SYS_TEXT_BASE)
