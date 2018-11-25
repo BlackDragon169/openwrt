@@ -7,18 +7,18 @@ Index: u-boot-2017-01-29-6946ebba/board/qcom/ipq40xx_cdp/ipq40xx_cdp.c
  
  	return 0;
 +#elif defined CONFIG_MODEL_FRITZ7530
-+	enetaddr[0] = 0x44;
-+	enetaddr[1] = 0x4E;
-+	enetaddr[2] = 0x6D;
-+	enetaddr[3] = 0xAE;
-+	enetaddr[4] = 0x42;
-+	enetaddr[5] = 0x9B;
-+	enetaddr[6] = 0x44;
-+	enetaddr[7] = 0x4E;
-+	enetaddr[8] = 0x6D;
-+	enetaddr[9] = 0xAE;
-+	enetaddr[10] = 0x42;
-+	enetaddr[11] = 0x9C;
++	enetaddr[0] = 0x0E;
++	enetaddr[1] = 0x2C;
++	enetaddr[2] = 0xFA;
++	enetaddr[3] = 0x55;
++	enetaddr[4] = 0xC6;
++	enetaddr[5] = 0xE4;
++	enetaddr[6] = 0x0E;
++	enetaddr[7] = 0x2C;
++	enetaddr[8] = 0xFA;
++	enetaddr[9] = 0x55;
++	enetaddr[10] = 0xC6;
++	enetaddr[11] = 0xE4;
 +	return 0;
  #else
  	if (sfi->flash_type != SMEM_BOOT_MMC_FLASH) {
