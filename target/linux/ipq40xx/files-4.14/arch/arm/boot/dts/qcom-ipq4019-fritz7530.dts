@@ -192,41 +192,43 @@
 
 			partition@0 {
 				label = "MIBIB";
-				reg = <0x000000 0x080000>;
+				reg = <0x000000 0x80000>;
 				read-only;
 			};
 
 			partition@80000 {
 				label = "MIBIB";
-				reg = <0x080000 0x080000>;
+				reg = <0x080000 0x80000>;
 				read-only;
 			};
 
 			partition@100000 {
 				label = "QSEE";
-				reg = <0x100000 0x080000>;
+				reg = <0x100000 0x80000>;
 				read-only;
 			};
 
 			partition@180000 {
 				label = "CDT";
-				reg = <0x180000 0x040000>;
+				reg = <0x180000 0x40000>;
 				read-only;
 			};
 
-			/*
-			 * 0x1C0000 - 0x240000 ???
-			 */
+			partition@1c0000 {
+				label = "QSEE_B";
+				reg = <0x1c0000 0x80000>;
+				read-only;
+			};
 
 			partition@240000 {
 				label = "urlader0";
-				reg = <0x240000 0x040000>;
+				reg = <0x240000 0x40000>;
 				read-only;
 			};
 
 			partition@280000 {
 				label = "urlader1";
-				reg = <0x280000 0x040000>;
+				reg = <0x280000 0x40000>;
 				read-only;
 			};
 
@@ -242,7 +244,6 @@
 			partition@f00000 {
 				label = "reserved-kernel";
 				reg = <0xf00000 0x400000>;
-				read-only;
 			};
 			partition@1300000 {
 				label = "ubi";
