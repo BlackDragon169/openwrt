@@ -31,6 +31,8 @@ avm,fritzbox-4040)
 		"0u@eth0" "1:lan" "2:lan" "3:lan" "4:lan"
 	;;
 avm,fritzbox-7530)
+	lan_mac_addr=$(fritz_tffs_nand -n maca -b -d $(find_mtd_part "nand-tffs"))
+	ucidef_set_interface_macaddr "lan" "$lan_mac_addr"
 	ucidef_add_switch "switch0" \
 		"0u@eth0" "1:lan" "2:lan" "3:lan" "4:lan"
 	;;
