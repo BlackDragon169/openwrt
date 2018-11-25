@@ -68,8 +68,10 @@ static char *name_filter = NULL;
 static bool show_all = false;
 static bool print_all_key_names = false;
 static bool swap_bytes = false;
+static bool validate_oob = false;
 static uint8_t readbuf[TFFS_SECTOR_SIZE];
 static uint8_t oobbuf[TFFS_SECTOR_OOB_SIZE];
+static uint32_t flashsize;
 static uint32_t blocksize;
 static int mtdfd;
 struct tffs_sectors *sectors;
@@ -174,19 +176,21 @@ static int find_entry(uint32_t id, struct tffs_entry *entry)
 				block_ended = 0;
 			}
 		} else if (sector_get_good(sector)) {
-			if (read_sectoroob(pos) || read_sector(pos)) {
+			if ((validate_oob && read_sectoroob(pos)) || read_sector(pos)) {
 				fprintf(stderr, "ERROR: sector isn't readable, but has been previously!\n");
 				exit(EXIT_FAILURE);
 			}
-			uint32_t oob_id = read_uint32(oobbuf, 0x02);
-			uint32_t oob_len = read_uint32(oobbuf, 0x06);
-			uint32_t oob_rev = read_uint32(oobbuf, 0x0a);
 			uint32_t read_id = read_uint32(readbuf, 0x00);
 			uint32_t read_len = read_uint32(readbuf, 0x04);
 			uint32_t read_rev = read_uint32(readbuf, 0x0c);
-			if (oob_id != read_id || oob_len != read_len || oob_rev != read_rev) {
-				fprintf(stderr, "Warning: sector has inconsistent metadata\n");
-				continue;
+			if (validate_oob) {
+				uint32_t oob_id = read_uint32(oobbuf, 0x02);
+				uint32_t oob_len = read_uint32(oobbuf, 0x06);
+				uint32_t oob_rev = read_uint32(oobbuf, 0x0a);
+				if (oob_id != read_id || oob_len != read_len || oob_rev != read_rev) {
+					fprintf(stderr, "Warning: sector has inconsistent metadata\n");
+					continue;
+				}
 			}
 			if (read_id == TFFS_ID_END) {
 				// no more entries in this block
@@ -353,6 +357,9 @@ static int show_matching_key_value(struct tffs_key_name_table *key_names)
 
 static int check_sector(off_t pos)
 {
+	if (!validate_oob) {
+		return 1;
+	}
 	if (read_sectoroob(pos)) {
 		return 0;
 	}
@@ -398,23 +405,26 @@ static int scan_mtd()
 	struct mtd_info_user info;
 
 	if (ioctl(mtdfd, MEMGETINFO, &info)) {
-		return 0;
+		fprintf(stderr, "WARNING: Could not read memory info. Using default erasesize!\n");
+		blocksize = 0x00020000;
+		flashsize = 8650752;
+	} else {
+		blocksize = info.erasesize;
+		flashsize = info.size;
 	}
 
-	blocksize = info.erasesize;
-
-	sectors = malloc(sizeof(*sectors) + (info.size / TFFS_SECTOR_SIZE + 7) / 8);
+	sectors = malloc(sizeof(*sectors) + (flashsize / TFFS_SECTOR_SIZE + 7) / 8);
 	if (sectors == NULL) {
 		fprintf(stderr, "ERROR: memory allocation failed!\n");
 		exit(EXIT_FAILURE);
 	}
-	sectors->num_sectors = info.size / TFFS_SECTOR_SIZE;
-	memset(sectors->sectors, 0xff, (info.size / TFFS_SECTOR_SIZE + 7) / 8);
+	sectors->num_sectors = flashsize / TFFS_SECTOR_SIZE;
+	memset(sectors->sectors, 0xff, (flashsize / TFFS_SECTOR_SIZE + 7) / 8);
 
 	uint32_t sector = 0, valid_blocks = 0;
 	uint8_t block_ok = 0;
-	for (off_t pos = 0; pos < info.size; sector++, pos += TFFS_SECTOR_SIZE) {
-		if (pos % info.erasesize == 0) {
+	for (off_t pos = 0; pos < flashsize; sector++, pos += TFFS_SECTOR_SIZE) {
+		if (pos % blocksize == 0) {
 			block_ok = check_block(pos, sector);
 			// first sector of the block contains metadata
 			// => handle it like a bad sector
@@ -439,10 +449,12 @@ static void usage(int status)
 	"\n"
 	"Options:\n"
 	"  -a              list all key value pairs found in the TFFS file/device\n"
+	"  -b              swap bytes while parsing the TFFS file/device\n"
 	"  -d <mtd>        inspect the TFFS on mtd device <mtd>\n"
 	"  -h              show this screen\n"
 	"  -l              list all supported keys\n"
 	"  -n <key name>   display the value of the given key\n"
+	"  -o              verify oob sector integrity\n"
 	);
 
 	exit(status);
@@ -454,7 +466,7 @@ static void parse_options(int argc, char *argv[])
 	{
 		int c;
 
-		c = getopt(argc, argv, "abd:hln:");
+		c = getopt(argc, argv, "abd:hln:o");
 		if (c == -1)
 			break;
 
@@ -482,6 +494,9 @@ static void parse_options(int argc, char *argv[])
 				name_filter = optarg;
 				show_all = false;
 				print_all_key_names = false;
+				break;
+			case 'o':
+				validate_oob = true;
 				break;
 			default:
 				usage(EXIT_FAILURE);
@@ -532,7 +547,7 @@ int main(int argc, char *argv[])
 
 	parse_key_names(&name_table, &key_names);
 	if (key_names.size < 1) {
-		fprintf(stderr, "ERROR: No name table found on tffs device %s\n",
+		fprintf(stderr, "ERROR: Name table on tffs device %s is invalid\n",
 			mtddev);
 		goto out_free_entry;
 	}
