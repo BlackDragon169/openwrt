@@ -129,6 +129,16 @@
 	gpio-leds {
 		compatible = "gpio-leds";
 
+		info_red {
+			label = "fritz7530:red:info";
+			gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
+		};
+
+		info {
+			label = "fritz7530:green:info";
+			gpios = <&tlmm 33 GPIO_ACTIVE_LOW>;
+		};
+
 		wlan {
 			label = "fritz7530:green:wlan";
 			gpios = <&tlmm 34 GPIO_ACTIVE_LOW>;
