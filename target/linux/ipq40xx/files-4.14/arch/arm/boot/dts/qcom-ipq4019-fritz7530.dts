@@ -187,6 +187,13 @@
 			bias-pull-down;
 		};
 	};
+
+	enable-usb-power {
+		line-name = "enable USB3 power";
+		gpios = <49 GPIO_ACTIVE_HIGH>;
+		gpio-hog;
+		output-high;
+	};
 };
 
 &nand {
