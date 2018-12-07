@@ -287,6 +287,18 @@
 	status = "okay";
 	perst-gpio = <&tlmm 38 GPIO_ACTIVE_LOW>;
 	wake-gpio = <&tlmm 50 GPIO_ACTIVE_LOW>;
+
+	bridge@0,0 {
+		reg = <0x00000000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+		ranges;
+
+		dsl: dsl@0,0 {
+			status = "okay";
+			reg = <0x00010000 0 0 0 0>;
+		};
+	};
 };
 
 &wifi0 {
